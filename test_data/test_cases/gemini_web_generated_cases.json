@@ -1,0 +1,90 @@
+{
+  "generated_at": "2026-05-13T01:43:23.715519",
+  "total_tests": 3,
+  "test_cases": [
+    {
+      "id": "TC_FALLBACK_001",
+      "name": "Fallback basic validation scenario",
+      "description": "Auto-generated fallback test for: Generate 5 website test cases for this page. URL: https://www.borntodev.com/2024/12/08/automated-web-testing-with-playwright/ Page context J",
+      "preconditions": [
+        "Application under test is accessible"
+      ],
+      "steps": [
+        "Open the target feature or page",
+        "Execute the primary happy-path action",
+        "Verify visible system response"
+      ],
+      "expected_results": [
+        "System responds without runtime error",
+        "Primary workflow result is displayed correctly"
+      ],
+      "test_data": {
+        "source": "fallback_generator"
+      },
+      "priority": "high",
+      "category": "functional",
+      "tags": [
+        "fallback",
+        "smoke"
+      ],
+      "author": "AI",
+      "created_date": "2026-05-13T01:42:58.253176"
+    },
+    {
+      "id": "TC_FALLBACK_001",
+      "name": "Fallback basic validation scenario",
+      "description": "Auto-generated fallback test for: Generate 5 website test cases for this page. URL: https://www.borntodev.com/2024/12/08/automated-web-testing-with-playwright/ Page context J",
+      "preconditions": [
+        "Application under test is accessible"
+      ],
+      "steps": [
+        "Open the target feature or page",
+        "Execute the primary happy-path action",
+        "Verify visible system response"
+      ],
+      "expected_results": [
+        "System responds without runtime error",
+        "Primary workflow result is displayed correctly"
+      ],
+      "test_data": {
+        "source": "fallback_generator"
+      },
+      "priority": "high",
+      "category": "functional",
+      "tags": [
+        "fallback",
+        "smoke"
+      ],
+      "author": "AI",
+      "created_date": "2026-05-13T01:43:11.562630"
+    },
+    {
+      "id": "TC_FALLBACK_001",
+      "name": "Fallback basic validation scenario",
+      "description": "Auto-generated fallback test for: Generate 5 website test cases for this page. URL: https://www.borntodev.com/2024/12/08/automated-web-testing-with-playwright/ Page context J",
+      "preconditions": [
+        "Application under test is accessible"
+      ],
+      "steps": [
+        "Open the target feature or page",
+        "Execute the primary happy-path action",
+        "Verify visible system response"
+      ],
+      "expected_results": [
+        "System responds without runtime error",
+        "Primary workflow result is displayed correctly"
+      ],
+      "test_data": {
+        "source": "fallback_generator"
+      },
+      "priority": "high",
+      "category": "functional",
+      "tags": [
+        "fallback",
+        "smoke"
+      ],
+      "author": "AI",
+      "created_date": "2026-05-13T01:43:23.714525"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+__pycache__/
+*.pyc
+.env
+node_modules/
+venv/
+playwright-report/
+test-results/
