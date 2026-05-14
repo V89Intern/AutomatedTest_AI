@@ -1,6 +1,6 @@
 """
 ai_engine/test_generator.py - AI-powered test case generation
-Uses Gemini/Claude/OpenAI/Ollama to intelligently generate test cases from descriptions
+Uses Gemini to intelligently generate test cases from descriptions
 """
 
 import json
@@ -12,18 +12,7 @@ from typing import List, Dict, Optional, Any
 from dataclasses import dataclass, asdict
 from datetime import datetime
 from pathlib import Path
-import requests
 from google import genai
-
-try:
-    from anthropic import Anthropic
-except ImportError:
-    Anthropic = None
-
-try:
-    from openai import OpenAI as OpenAIClient
-except ImportError:
-    OpenAIClient = None
 
 from loguru import logger
 
@@ -60,15 +49,15 @@ class TestCase:
     tags: List[str]
     author: str = "AI"
     created_date: str = None
-    
+
     def __post_init__(self):
         if self.created_date is None:
             self.created_date = datetime.now().isoformat()
-    
+
     def to_dict(self) -> Dict:
         """Convert to dictionary"""
         return asdict(self)
-    
+
     def to_json(self) -> str:
         """Convert to JSON string"""
         return json.dumps(self.to_dict(), indent=2)
@@ -76,68 +65,64 @@ class TestCase:
 
 class TestGenerator:
     """AI-powered test case generator"""
-    GEMINI_FIXED_MODEL = "gemini-2.5-flash"  # Locked to a specific Gemini model for consistency
+    GEMINI_FIXED_MODEL = "gemini-2.5-flash"
     GEMINI_MAX_RETRIES = 5
     GEMINI_RETRY_BASE_SECONDS = 1
-    MAX_DESCRIPTION_CHARS = 10000
-    MAX_TESTS_PER_REQUEST = 2
-    
+    MAX_DESCRIPTION_CHARS = 20000
+    MAX_TESTS_PER_REQUEST = 10
+
     def __init__(
         self,
         model: str = "gemini-2.5-flash",
         ai_provider: str = "gemini",
         api_key: Optional[str] = None,
         temperature: float = 0.7,
-        max_tokens: int = 2000,
+        max_tokens: int = 8192,
         ollama_host: str = "http://localhost:11434",
         ollama_timeout: int = 600
     ):
         """
         Initialize test generator
-        
+
         Args:
-            model: Model name (deepseek-r1:8b, claude-3.5-sonnet, gpt-4, etc)
-            ai_provider: AI provider (gemini, ollama, anthropic, openai)
+            model: Model name
+            ai_provider: AI provider (gemini only)
             api_key: API key for the provider
             temperature: Creativity level (0-1)
-            max_tokens: Maximum tokens in response
-            ollama_host: Ollama base URL
-            ollama_timeout: Timeout for Ollama requests in seconds
+            max_tokens: Maximum tokens in response (unused — Gemini uses its own default)
+            ollama_host: Ollama base URL (reserved, unused)
+            ollama_timeout: Timeout for Ollama requests in seconds (reserved, unused)
         """
         _load_env_file()
 
-        env_provider = "gemini"
-        env_model = self.GEMINI_FIXED_MODEL
         env_temp = float(os.getenv("AI_TEMPERATURE", str(temperature)))
-        env_max_tokens = int(os.getenv("AI_MAX_TOKENS", str(max_tokens)))
         env_ollama_host = os.getenv("OLLAMA_HOST", ollama_host)
         env_ollama_timeout = int(os.getenv("OLLAMA_TIMEOUT", str(ollama_timeout)))
 
-        self.model = "gemini-2.5-flash"
+        self.model = self.GEMINI_FIXED_MODEL
         self.ai_provider = "gemini"
         self.temperature = env_temp
-        self.max_tokens = env_max_tokens
         self.ollama_host = env_ollama_host.rstrip("/")
         self.ollama_timeout = env_ollama_timeout
-        self.api_key = api_key or self._resolve_api_key(env_provider)
+        self.api_key = api_key or self._resolve_api_key("gemini")
         self.client = None
         self.gemini_max_requests_per_minute = int(os.getenv("GEMINI_MAX_REQUESTS_PER_MINUTE", "10"))
         self._request_timestamps: deque[float] = deque()
-        
-        # Fixed configuration: Gemini only.
-        if self.ai_provider != "gemini":
-            raise ValueError("This generator is locked to Gemini provider only")
-        
-        # Initialize Gemini client here, after _load_env_file() has run
+
+        # Initialize Gemini client once, after _load_env_file() has run
         if self.api_key:
             try:
                 self.client = genai.Client(api_key=self.api_key)
             except Exception as e:
                 logger.warning(f"Failed to initialize Gemini client: {str(e)}")
                 self.client = None
-        
+
         logger.info(f"Initialized TestGenerator with {self.ai_provider}/{self.model}")
-    
+
+    # ------------------------------------------------------------------ #
+    #  Public methods                                                       #
+    # ------------------------------------------------------------------ #
+
     def generate_from_description(
         self,
         description: str,
@@ -148,8 +133,8 @@ class TestGenerator:
         category: str = "functional"
     ) -> List[TestCase]:
         """
-        Generate test cases from feature description
-        
+        Generate test cases from feature description.
+
         Args:
             description: Feature description or user story
             test_count: Number of test cases to generate
@@ -157,7 +142,7 @@ class TestGenerator:
             include_negative_tests: Include negative scenario tests
             priority: Default priority level
             category: Test category
-            
+
         Returns:
             List of generated TestCase objects
         """
@@ -181,54 +166,50 @@ class TestGenerator:
 
             response = self._call_ai(prompt)
             batch_cases = self._parse_test_cases(response, priority, category)
+
             if not batch_cases:
-                logger.warning(f"Batch {batch_index}: unparseable model output, using deterministic fallback")
-                batch_cases = [self._build_fallback_test_case(safe_description, priority, category)]
+                logger.warning(
+                    f"Batch {batch_index}: unparseable model output, using deterministic fallback"
+                )
+                # FIX: ส่ง index ที่ถูกต้องเพื่อให้ id ไม่ซ้ำ
+                current_index = len(all_cases) + 1
+                batch_cases = [self._build_fallback_test_case(
+                    safe_description, priority, category, index=current_index
+                )]
 
             all_cases.extend(batch_cases[:batch_count])
             remaining -= batch_count
 
-            # Space requests to reduce token-per-minute pressure.
             if remaining > 0:
                 time.sleep(1)
 
         logger.info(f"Generated {len(all_cases)} test cases")
         return all_cases[:test_count]
-    
+
     def generate_from_user_story(
         self,
         story: str,
         acceptance_criteria: List[str],
         test_count: int = 10
     ) -> List[TestCase]:
-        """
-        Generate test cases from user story and acceptance criteria
-        
-        Args:
-            story: User story text
-            acceptance_criteria: List of acceptance criteria
-            test_count: Number of test cases to generate
-            
-        Returns:
-            List of generated TestCase objects
-        """
+        """Generate test cases from user story and acceptance criteria."""
         logger.info("Generating test cases from user story")
-        
+
         prompt = f"""
         Generate comprehensive test cases for the following user story:
-        
+
         STORY: {story}
-        
+
         ACCEPTANCE CRITERIA:
         {chr(10).join(f'- {ac}' for ac in acceptance_criteria)}
-        
+
         Create {test_count} test cases that cover:
         1. All acceptance criteria
         2. Edge cases and boundary conditions
         3. Negative scenarios
         4. Performance considerations
         5. Security aspects
-        
+
         For each test case, provide:
         - Test ID (TC_XXX)
         - Name
@@ -240,118 +221,90 @@ class TestGenerator:
         - Priority (High/Medium/Low)
         - Category (Functional/Regression/Smoke/Performance/Security)
         - Tags
-        
+
         Return as JSON array.
         """
-        
+
         response = self._call_ai(prompt)
         test_cases = self._parse_test_cases(response)
-        
+
         logger.info(f"Generated {len(test_cases)} test cases from user story")
         return test_cases
-    
+
     def generate_regression_tests(
         self,
         feature_name: str,
         previous_bugs: List[str],
         test_count: int = 5
     ) -> List[TestCase]:
-        """
-        Generate regression test cases based on previous bugs
-        
-        Args:
-            feature_name: Name of the feature
-            previous_bugs: List of previous bug descriptions
-            test_count: Number of test cases to generate
-            
-        Returns:
-            List of generated TestCase objects
-        """
+        """Generate regression test cases based on previous bugs."""
         logger.info(f"Generating regression tests for {feature_name}")
-        
+
         bug_list = "\n".join(f"- Bug: {bug}" for bug in previous_bugs)
-        
+
         prompt = f"""
         Create regression test cases to prevent these bugs from happening again:
-        
+
         Feature: {feature_name}
-        
+
         Previous Bugs:
         {bug_list}
-        
+
         Generate {test_count} test cases that specifically test the areas where bugs occurred.
         Each test case should be designed to catch the regression early.
-        
+
         Return as JSON array with detailed test cases.
         """
-        
+
         response = self._call_ai(prompt)
         test_cases = self._parse_test_cases(response, category="regression")
-        
+
         logger.info(f"Generated {len(test_cases)} regression test cases")
         return test_cases
-    
+
     def optimize_test_cases(
         self,
         test_cases: List[TestCase],
         criteria: str = "reduce_redundancy"
     ) -> List[TestCase]:
-        """
-        Optimize existing test cases to remove redundancy and improve coverage
-        
-        Args:
-            test_cases: List of test cases to optimize
-            criteria: Optimization criteria (reduce_redundancy, improve_coverage, etc)
-            
-        Returns:
-            Optimized list of test cases
-        """
+        """Optimize existing test cases to remove redundancy and improve coverage."""
         logger.info(f"Optimizing {len(test_cases)} test cases")
-        
+
         test_cases_json = json.dumps([tc.to_dict() for tc in test_cases], indent=2)
-        
+
         prompt = f"""
         Analyze and optimize these test cases based on {criteria}:
-        
+
         {test_cases_json}
-        
+
         Provide optimized test cases by:
         1. Removing redundant test cases
         2. Consolidating similar tests
         3. Improving coverage gaps
         4. Prioritizing high-impact tests
-        
+
         Return as JSON array.
         """
-        
+
         response = self._call_ai(prompt)
         optimized = self._parse_test_cases(response)
-        
+
         logger.info(f"Optimized to {len(optimized)} test cases")
         return optimized
-    
+
     def generate_edge_cases(
         self,
         feature_description: str,
         test_count: int = 5
     ) -> List[TestCase]:
-        """
-        Generate edge case test cases
-        
-        Args:
-            feature_description: Description of the feature
-            test_count: Number of edge case tests to generate
-            
-        Returns:
-            List of edge case TestCase objects
-        """
+        """Generate edge case test cases."""
         logger.info("Generating edge case test cases")
-        
+
         prompt = f"""
         Generate {test_count} edge case test cases for this feature:
-        
+
         {feature_description}
-        
+
         Focus on:
         - Boundary conditions
         - Extreme values
@@ -360,63 +313,50 @@ class TestGenerator:
         - Large data sets
         - Null/empty values
         - Concurrency issues
-        
+
         Return as JSON array with detailed edge case test cases.
         """
-        
+
         response = self._call_ai(prompt)
         test_cases = self._parse_test_cases(response, category="edge_case")
-        
+
         return test_cases
-    
+
     def save_test_cases(
         self,
         test_cases: List[TestCase],
         output_path: Path
     ) -> None:
-        """
-        Save test cases to JSON file
-        
-        Args:
-            test_cases: List of test cases
-            output_path: Output file path
-        """
+        """Save test cases to JSON file."""
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        
+
         data = {
             "generated_at": datetime.now().isoformat(),
             "total_tests": len(test_cases),
             "test_cases": [tc.to_dict() for tc in test_cases]
         }
-        
-        with open(output_path, 'w') as f:
+
+        with open(output_path, "w") as f:
             json.dump(data, f, indent=2)
-        
+
         logger.info(f"Saved {len(test_cases)} test cases to {output_path}")
-    
+
     def load_test_cases(self, input_path: Path) -> List[TestCase]:
-        """
-        Load test cases from JSON file
-        
-        Args:
-            input_path: Input file path
-            
-        Returns:
-            List of TestCase objects
-        """
-        with open(input_path, 'r') as f:
+        """Load test cases from JSON file."""
+        with open(input_path, "r") as f:
             data = json.load(f)
-        
+
         test_cases = []
         for tc_data in data.get("test_cases", []):
-            test_case = TestCase(**tc_data)
-            test_cases.append(test_case)
-        
+            test_cases.append(TestCase(**tc_data))
+
         logger.info(f"Loaded {len(test_cases)} test cases from {input_path}")
         return test_cases
-    
-    # Private methods
-    
+
+    # ------------------------------------------------------------------ #
+    #  Private methods                                                      #
+    # ------------------------------------------------------------------ #
+
     def _build_generation_prompt(
         self,
         description: str,
@@ -425,21 +365,13 @@ class TestGenerator:
         include_negative_tests: bool,
         priority: str,
         category: str
-        ) -> str:
-        """Build the prompt for test case generation"""
-
+    ) -> str:
+        """Build the prompt for test case generation."""
         extra_instructions = []
-
         if include_edge_cases:
-            extra_instructions.append(
-            "- Include edge case scenarios with boundary values"
-        )
-
+            extra_instructions.append("- Include edge case scenarios with boundary values")
         if include_negative_tests:
-            extra_instructions.append(
-            "- Include negative test scenarios (error handling)"
-        )
-
+            extra_instructions.append("- Include negative test scenarios (error handling)")
         extra_text = "\n".join(extra_instructions) if extra_instructions else ""
 
         return f"""Generate exactly {test_count} AI website automation test cases.
@@ -618,94 +550,96 @@ Remember:
         if len(normalized) <= self.MAX_DESCRIPTION_CHARS:
             return normalized
         logger.warning(
-            f"Input description too large ({len(normalized)} chars), truncating to {self.MAX_DESCRIPTION_CHARS} chars"
+            f"Input description too large ({len(normalized)} chars), "
+            f"truncating to {self.MAX_DESCRIPTION_CHARS} chars"
         )
         return normalized[: self.MAX_DESCRIPTION_CHARS]
-    
+
     def _call_ai(self, prompt: str) -> str:
-        """Call Gemini API with retry logic for handling rate limits and server errors"""
-        from google import genai
+        """
+        Call Gemini API with retry logic for rate limits and server errors.
+
+        FIX: reuse self.client instead of creating a new one every attempt.
+        FIX: remove max_output_tokens so Gemini uses its own maximum,
+             preventing JSON from being truncated mid-response.
+        """
         from google.genai import errors
-        
-        if self.ai_provider != "gemini":
-            raise ValueError("Only Gemini provider is supported in this build")
-        
+
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY is required when AI_PROVIDER=gemini")
-        
+
+        # Lazily initialise client if it wasn't ready at startup
+        if self.client is None:
+            self.client = genai.Client(api_key=self.api_key)
+
         model_name = self._normalize_gemini_model_name(self.model)
-        max_retries = self.GEMINI_MAX_RETRIES
-        retry_delay = self.GEMINI_RETRY_BASE_SECONDS
-        
-        for attempt in range(max_retries):
+
+        for attempt in range(self.GEMINI_MAX_RETRIES):
             try:
-                client = genai.Client(api_key=self.api_key)
                 self._enforce_rate_limit()
-                
-                # Use the correct API for google-generativeai
-                response = client.models.generate_content(
+
+                # FIX: no max_output_tokens → full JSON is never cut off
+                response = self.client.models.generate_content(
                     model=model_name,
                     contents=prompt,
                     config={
                         "temperature": self.temperature,
-                        "max_output_tokens": self.max_tokens
                     }
                 )
-                
-                # Parse response - handle both text and structured responses
+
                 if hasattr(response, "text"):
                     text_output = response.text.strip()
                 elif hasattr(response, "candidates") and response.candidates:
-                    # Fallback for older response format
                     candidate = response.candidates[0]
                     if hasattr(candidate, "content") and hasattr(candidate.content, "parts"):
                         text_output = "\n".join(
-                            part.text for part in candidate.content.parts if hasattr(part, "text")
+                            part.text
+                            for part in candidate.content.parts
+                            if hasattr(part, "text")
                         ).strip()
                     else:
                         text_output = ""
                 else:
                     text_output = ""
-                
+
                 if not text_output:
                     raise RuntimeError("Empty text response from Gemini API")
+
+                logger.debug(f"Gemini response length: {len(text_output)} chars")
                 return text_output
-                
+
             except (errors.ServerError, errors.RateLimitError) as e:
-                # Handle 503 and rate limit errors with retry
-                if attempt < max_retries - 1:
-                    wait_time = retry_delay * (2 ** attempt)  # Exponential backoff
+                if attempt < self.GEMINI_MAX_RETRIES - 1:
+                    wait_time = self.GEMINI_RETRY_BASE_SECONDS * (2 ** attempt)
                     logger.warning(
-                        f"API error (attempt {attempt + 1}/{max_retries}): {str(e)}. "
+                        f"API error (attempt {attempt + 1}/{self.GEMINI_MAX_RETRIES}): {e}. "
                         f"Retrying in {wait_time:.1f}s..."
                     )
                     time.sleep(wait_time)
-                    continue
                 else:
-                    logger.error(f"AI API call failed after {max_retries} attempts: {str(e)}")
+                    logger.error(f"AI API call failed after {self.GEMINI_MAX_RETRIES} attempts: {e}")
                     raise
             except Exception as e:
-                logger.error(f"AI API call failed ({self.ai_provider}): {str(e)}")
+                logger.error(f"AI API call failed ({self.ai_provider}): {e}")
                 raise
+
     def _parse_test_cases(
         self,
         response: str,
         priority: str = "medium",
         category: str = "functional"
     ) -> List[TestCase]:
-        """Parse AI response into TestCase objects"""
-        
+        """Parse AI response into TestCase objects."""
         try:
             test_cases_data = self._extract_test_cases_payload(response)
             if not test_cases_data:
                 logger.warning("No JSON found in response")
                 return []
-            
+
             test_cases = []
             for tc_data in test_cases_data:
                 try:
-                    # Ensure required fields
-                    tc_data.setdefault("id", f"TC_AUTO_{len(test_cases)+1:03d}")
+                    tc_data.setdefault("id", f"TC_AUTO_{len(test_cases) + 1:03d}")
                     tc_data.setdefault("name", "AI Generated Test")
                     tc_data.setdefault("description", "Generated by Gemini")
                     tc_data.setdefault("preconditions", [])
@@ -713,62 +647,84 @@ Remember:
                     tc_data.setdefault("expected_results", [])
                     tc_data.setdefault("test_data", {})
                     tc_data.setdefault("tags", [])
-                    
-                    test_case = TestCase(**tc_data)
-                    test_cases.append(test_case)
+                    # FIX: apply caller-supplied defaults when AI omits these fields
+                    tc_data.setdefault("priority", priority)
+                    tc_data.setdefault("category", category)
+
+                    test_cases.append(TestCase(**tc_data))
                 except Exception as e:
-                    logger.warning(f"Failed to parse test case: {str(e)}")
-                    continue
-            
+                    logger.warning(f"Failed to parse test case: {e}")
+
             return test_cases
-        
+
         except json.JSONDecodeError as e:
-            logger.error(f"JSON parsing failed: {str(e)}")
+            logger.error(f"JSON parsing failed: {e}")
             return []
 
-    def _build_fallback_test_case(self, description: str, priority: str, category: str) -> TestCase:
-        """Create a safe fallback test case when model output is not parseable."""
-
+    def _build_fallback_test_case(
+        self,
+        description: str,
+        priority: str,
+        category: str,
+        index: int = 1,   # FIX: accept index so id is never duplicated
+    ) -> TestCase:
+        """
+        Create a safe fallback test case when model output is not parseable.
+        Uses TEST_REAL_URL env var (set by web_url_tester.py --url) as the goto target.
+        """
+        url = self._get_real_test_url()
         short_desc = " ".join(description.strip().split())[:140]
         return TestCase(
-            id="TC_FALLBACK_001",
-            name="Fallback basic validation scenario",
-            description=f"Auto-generated fallback test for: {short_desc}",
+            id=f"TC_{index:03d}",          # FIX: TC_001, TC_002, TC_003 …
+            name="Basic page load and visibility test",
+            description=f"Auto-generated test for: {short_desc}",
             preconditions=["Application under test is accessible"],
             steps=[
-                "Open the target feature or page",
-                "Execute the primary happy-path action",
-                "Verify visible system response",
+                "Navigate to the application",
+                "Verify page loads successfully",
+                "Confirm body element is visible",
             ],
             expected_results=[
-                "System responds without runtime error",
-                "Primary workflow result is displayed correctly",
+                "Page loads without errors",
+                "Body element is visible on the page",
+                "Application is responsive",
             ],
-            test_data={"source": "fallback_generator"},
+            test_data={
+                "actions": [
+                    {"type": "goto", "value": url},   # FIX: real URL from --url
+                    {"type": "wait", "value": 1000},
+                    {"type": "assert_element_visible", "selector": "body"},
+                ]
+            },
             priority=priority,
             category=category,
-            tags=["fallback", "smoke"],
+            tags=["fallback", "smoke", "automated"],
         )
+
+    def _get_real_test_url(self) -> str:
+        """
+        Return the target URL supplied via --url (stored in TEST_REAL_URL env var
+        by web_url_tester.py before importing this module).
+        Falls back to https://example.com/ if not set.
+        """
+        return os.getenv("TEST_REAL_URL", "https://example.com/")
 
     def _extract_test_cases_payload(self, response: str) -> List[Dict[str, Any]]:
         """Extract test case payload from common LLM JSON response shapes."""
         cleaned = self._clean_llm_response(response)
-
-        # Try greedy extraction: find all JSON arrays and objects
         decoder = json.JSONDecoder()
-        
-        # First, try to find a JSON array
+
+        # 1. Try to find a JSON array that starts with [{
         for match in re.finditer(r'\[\s*\{', cleaned):
             try:
                 obj, _ = decoder.raw_decode(cleaned[match.start():])
-                if isinstance(obj, list) and len(obj) > 0:
-                    # Validate that items look like test cases
-                    if all(isinstance(item, dict) for item in obj):
-                        return obj
+                if isinstance(obj, list) and obj and all(isinstance(i, dict) for i in obj):
+                    logger.debug(f"Extracted {len(obj)} test cases from JSON array")
+                    return obj
             except json.JSONDecodeError:
                 continue
-        
-        # Try to find standalone JSON objects
+
+        # 2. Fallback: scan character-by-character for any JSON value
         for idx, char in enumerate(cleaned):
             if char not in "[{":
                 continue
@@ -777,22 +733,24 @@ Remember:
             except json.JSONDecodeError:
                 continue
 
-            if isinstance(obj, list) and len(obj) > 0:
+            if isinstance(obj, list) and obj:
                 return obj
             if isinstance(obj, dict):
-                # Check if it contains test_cases array
                 if isinstance(obj.get("test_cases"), list):
                     return obj["test_cases"]
-                # Check if it's a single test case
-                required_fields = {"id", "name", "description"}
-                if required_fields.issubset(obj.keys()):
+                if {"id", "name", "description"}.issubset(obj.keys()):
                     return [obj]
 
-        logger.debug(f"Could not extract JSON from response. Cleaned response:\n{cleaned[:500]}")
+        logger.debug(
+            f"Could not extract JSON from response.\n"
+            f"Total chars: {len(cleaned)}\n"
+            f"First 500 : {cleaned[:500]}\n"
+            f"Last  200 : {cleaned[-200:]}"
+        )
         return []
 
     def _clean_llm_response(self, response: str) -> str:
-        """Remove common non-JSON wrappers from local LLM responses."""
+        """Remove common non-JSON wrappers from LLM responses."""
         text = response.strip()
         text = re.sub(r"<think>[\s\S]*?</think>", "", text, flags=re.IGNORECASE)
         text = re.sub(r"```json\s*([\s\S]*?)```", r"\1", text, flags=re.IGNORECASE)
@@ -811,18 +769,15 @@ Remember:
 
     def _resolve_api_key(self, provider: str) -> Optional[str]:
         """Resolve API key from env by provider."""
-        key_map = {
-            "gemini": "GEMINI_API_KEY",
-            "openai": "OPENAI_API_KEY",
-            "anthropic": "ANTHROPIC_API_KEY",
-        }
+        key_map = {"gemini": "GEMINI_API_KEY"}
         env_key = key_map.get((provider or "").lower())
         return os.getenv(env_key) if env_key else None
 
     def _enforce_rate_limit(self) -> None:
-        """Throttle requests to stay under configured per-minute ceiling."""
+        """Throttle requests to stay under the configured per-minute ceiling."""
         now = time.time()
         window = 60.0
+
         while self._request_timestamps and now - self._request_timestamps[0] >= window:
             self._request_timestamps.popleft()
 

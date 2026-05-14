@@ -1,90 +1,246 @@
 {
-  "generated_at": "2026-05-13T01:43:23.715519",
-  "total_tests": 3,
+  "generated_at": "2026-05-15T02:02:39.219025",
+  "total_tests": 5,
   "test_cases": [
     {
-      "id": "TC_FALLBACK_001",
-      "name": "Fallback basic validation scenario",
-      "description": "Auto-generated fallback test for: Generate 5 website test cases for this page. URL: https://www.borntodev.com/2024/12/08/automated-web-testing-with-playwright/ Page context J",
+      "id": "TC_001",
+      "name": "Verify successful search for a character",
+      "description": "Test if searching for an existing character name, '\u0e0b\u0e32\u0e27\u0e32\u0e14\u0e30 \u0e2a\u0e36\u0e19\u0e30\u0e42\u0e22\u0e0a\u0e34', redirects to the correct character page on Wikipedia.",
       "preconditions": [
-        "Application under test is accessible"
+        "The page is loaded successfully."
       ],
       "steps": [
-        "Open the target feature or page",
-        "Execute the primary happy-path action",
-        "Verify visible system response"
+        "Navigate to the specified Wikipedia page.",
+        "Type '\u0e0b\u0e32\u0e27\u0e32\u0e14\u0e30 \u0e2a\u0e36\u0e19\u0e30\u0e42\u0e22\u0e0a\u0e34' into the search input field.",
+        "Click the '\u0e04\u0e49\u0e19\u0e2b\u0e32' (Search) button.",
+        "Verify that the URL contains the character's article path.",
+        "Verify that the character's name '\u0e0b\u0e32\u0e27\u0e32\u0e14\u0e30 \u0e2a\u0e36\u0e19\u0e30\u0e42\u0e22\u0e0a\u0e34' is visible on the new page."
       ],
       "expected_results": [
-        "System responds without runtime error",
-        "Primary workflow result is displayed correctly"
+        "The browser navigates to the '\u0e0b\u0e32\u0e27\u0e32\u0e14\u0e30 \u0e2a\u0e36\u0e19\u0e30\u0e42\u0e22\u0e0a\u0e34' Wikipedia article page.",
+        "The title '\u0e0b\u0e32\u0e27\u0e32\u0e14\u0e30 \u0e2a\u0e36\u0e19\u0e30\u0e42\u0e22\u0e0a\u0e34' is displayed."
       ],
       "test_data": {
-        "source": "fallback_generator"
+        "actions": [
+          {
+            "type": "goto",
+            "value": "https://th.wikipedia.org/wiki/%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%95%E0%B8%B1%E0%B8%A7%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B9%83%E0%B8%99%E0%B8%84%E0%B8%A3%E0%B8%B9%E0%B8%9E%E0%B8%B4%E0%B9%80%E0%B8%A8%E0%B8%A9%E0%B8%88%E0%B8%AD%E0%B8%A1%E0%B8%9B%E0%B9%88%E0%B8%A7%E0%B8%99_%E0%B8%A3%E0%B8%B5%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B8%99!"
+          },
+          {
+            "type": "fill",
+            "selector": "input[id='searchInput']",
+            "value": "\u0e0b\u0e32\u0e27\u0e32\u0e14\u0e30 \u0e2a\u0e36\u0e19\u0e30\u0e42\u0e22\u0e0a\u0e34"
+          },
+          {
+            "type": "click",
+            "selector": "button.cdx-search-input__end-button"
+          },
+          {
+            "type": "assert_url_contains",
+            "value": "/wiki/%E0%B8%8B%E0%B8%B2%E0%B8%A7%E0%B8%B2%E0%B8%94%E0%B8%B0_%E0%B8%AA%E0%B8%B6%E0%B8%99%E0%B8%B0%E0%B9%82%E0%B8%A2%E0%B8%8A%E0%B8%B4"
+          },
+          {
+            "type": "assert_text_visible",
+            "value": "\u0e0b\u0e32\u0e27\u0e32\u0e14\u0e30 \u0e2a\u0e36\u0e19\u0e30\u0e42\u0e22\u0e0a\u0e34"
+          }
+        ]
       },
       "priority": "high",
       "category": "functional",
       "tags": [
-        "fallback",
-        "smoke"
+        "search",
+        "navigation",
+        "positive"
       ],
       "author": "AI",
-      "created_date": "2026-05-13T01:42:58.253176"
+      "created_date": "2026-05-15T02:02:39.218018"
     },
     {
-      "id": "TC_FALLBACK_001",
-      "name": "Fallback basic validation scenario",
-      "description": "Auto-generated fallback test for: Generate 5 website test cases for this page. URL: https://www.borntodev.com/2024/12/08/automated-web-testing-with-playwright/ Page context J",
+      "id": "TC_002",
+      "name": "Verify navigation to 'Vongola Family' section via TOC link",
+      "description": "Test if clicking the '\u0e27\u0e2d\u0e07\u0e42\u0e01\u0e40\u0e25\u0e48 \u0e41\u0e1f\u0e21\u0e34\u0e25\u0e35' link in the Table of Contents correctly scrolls to and displays the target section.",
       "preconditions": [
-        "Application under test is accessible"
+        "The page is loaded successfully."
       ],
       "steps": [
-        "Open the target feature or page",
-        "Execute the primary happy-path action",
-        "Verify visible system response"
+        "Navigate to the specified Wikipedia page.",
+        "Click the '\u0e27\u0e2d\u0e07\u0e42\u0e01\u0e40\u0e25\u0e48 \u0e41\u0e1f\u0e21\u0e34\u0e25\u0e35' link within the Table of Contents.",
+        "Verify that the URL contains the section anchor for '\u0e27\u0e2d\u0e07\u0e42\u0e01\u0e40\u0e25\u0e48 \u0e41\u0e1f\u0e21\u0e34\u0e25\u0e35'.",
+        "Verify that the heading '\u0e27\u0e2d\u0e07\u0e42\u0e01\u0e40\u0e25\u0e48 \u0e41\u0e1f\u0e21\u0e34\u0e25\u0e35' is visible in the viewport."
       ],
       "expected_results": [
-        "System responds without runtime error",
-        "Primary workflow result is displayed correctly"
+        "The page scrolls to the '\u0e27\u0e2d\u0e07\u0e42\u0e01\u0e40\u0e25\u0e48 \u0e41\u0e1f\u0e21\u0e34\u0e25\u0e35' section.",
+        "The URL reflects the section anchor."
       ],
       "test_data": {
-        "source": "fallback_generator"
+        "actions": [
+          {
+            "type": "goto",
+            "value": "https://th.wikipedia.org/wiki/%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%95%E0%B8%B1%E0%B8%A7%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B9%83%E0%B8%99%E0%B8%84%E0%B8%A3%E0%B8%B9%E0%B8%9E%E0%B8%B4%E0%B9%80%E0%B8%A8%E0%B8%A9%E0%B8%88%E0%B8%AD%E0%B8%A1%E0%B8%9B%E0%B9%88%E0%B8%A7%E0%B8%99_%E0%B8%A3%E0%B8%B5%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B8%99!"
+          },
+          {
+            "type": "click",
+            "selector": "a[href='#\u0e27\u0e2d\u0e07\u0e42\u0e01\u0e40\u0e25\u0e48_\u0e41\u0e1f\u0e21\u0e34\u0e25\u0e35']"
+          },
+          {
+            "type": "assert_url_contains",
+            "value": "#\u0e27\u0e2d\u0e07\u0e42\u0e01\u0e40\u0e25\u0e48_\u0e41\u0e1f\u0e21\u0e34\u0e25\u0e35"
+          },
+          {
+            "type": "assert_text_visible",
+            "value": "\u0e27\u0e2d\u0e07\u0e42\u0e01\u0e40\u0e25\u0e48 \u0e41\u0e1f\u0e21\u0e34\u0e25\u0e35"
+          }
+        ]
       },
-      "priority": "high",
+      "priority": "medium",
       "category": "functional",
       "tags": [
-        "fallback",
-        "smoke"
+        "navigation",
+        "TOC",
+        "links"
       ],
       "author": "AI",
-      "created_date": "2026-05-13T01:43:11.562630"
+      "created_date": "2026-05-15T02:02:39.218018"
     },
     {
-      "id": "TC_FALLBACK_001",
-      "name": "Fallback basic validation scenario",
-      "description": "Auto-generated fallback test for: Generate 5 website test cases for this page. URL: https://www.borntodev.com/2024/12/08/automated-web-testing-with-playwright/ Page context J",
+      "id": "TC_003",
+      "name": "Verify 'Donate to Wikipedia' external link navigation",
+      "description": "Test if clicking the '\u0e1a\u0e23\u0e34\u0e08\u0e32\u0e04\u0e43\u0e2b\u0e49\u0e27\u0e34\u0e01\u0e34\u0e1e\u0e35\u0e40\u0e14\u0e35\u0e22' (Donate to Wikipedia) link navigates to the correct external donation page.",
       "preconditions": [
-        "Application under test is accessible"
+        "The page is loaded successfully."
       ],
       "steps": [
-        "Open the target feature or page",
-        "Execute the primary happy-path action",
-        "Verify visible system response"
+        "Navigate to the specified Wikipedia page.",
+        "Click the '\u0e1a\u0e23\u0e34\u0e08\u0e32\u0e04\u0e43\u0e2b\u0e49\u0e27\u0e34\u0e01\u0e34\u0e1e\u0e35\u0e40\u0e14\u0e35\u0e22' link located in the sidebar.",
+        "Verify that the URL changes to the Wikimedia donation page."
       ],
       "expected_results": [
-        "System responds without runtime error",
-        "Primary workflow result is displayed correctly"
+        "The browser successfully navigates to 'https://donate.wikimedia.org'."
       ],
       "test_data": {
-        "source": "fallback_generator"
+        "actions": [
+          {
+            "type": "goto",
+            "value": "https://th.wikipedia.org/wiki/%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%95%E0%B8%B1%E0%B8%A7%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B9%83%E0%B8%99%E0%B8%84%E0%B8%A3%E0%B8%B9%E0%B8%9E%E0%B8%B4%E0%B9%80%E0%B8%A8%E0%B8%A9%E0%B8%88%E0%B8%AD%E0%B8%A1%E0%B8%9B%E0%B9%88%E0%B8%A7%E0%B8%99_%E0%B8%A3%E0%B8%B5%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B8%99!"
+          },
+          {
+            "type": "click",
+            "selector": "a[href*='donate.wikimedia.org']"
+          },
+          {
+            "type": "assert_url_contains",
+            "value": "donate.wikimedia.org"
+          }
+        ]
+      },
+      "priority": "medium",
+      "category": "functional",
+      "tags": [
+        "external link",
+        "navigation"
+      ],
+      "author": "AI",
+      "created_date": "2026-05-15T02:02:39.218018"
+    },
+    {
+      "id": "TC_004",
+      "name": "Verify search for a non-existent term (negative scenario)",
+      "description": "Test the behavior when searching for a term that does not exist on Wikipedia, expecting a 'no results' message.",
+      "preconditions": [
+        "The page is loaded successfully."
+      ],
+      "steps": [
+        "Navigate to the specified Wikipedia page.",
+        "Type a random, non-existent string 'nonexistentcharacter123xyz' into the search input field.",
+        "Click the '\u0e04\u0e49\u0e19\u0e2b\u0e32' (Search) button.",
+        "Verify that the URL indicates a search results page.",
+        "Verify that a 'no page' message (e.g., '\u0e44\u0e21\u0e48\u0e21\u0e35\u0e2b\u0e19\u0e49\u0e32\u0e17\u0e35\u0e48\u0e0a\u0e37\u0e48\u0e2d...') is displayed."
+      ],
+      "expected_results": [
+        "The search results page is displayed with a message indicating no matching pages or results.",
+        "The URL contains the search query."
+      ],
+      "test_data": {
+        "actions": [
+          {
+            "type": "goto",
+            "value": "https://th.wikipedia.org/wiki/%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%95%E0%B8%B1%E0%B8%A7%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B9%83%E0%B8%99%E0%B8%84%E0%B8%A3%E0%B8%B9%E0%B8%9E%E0%B8%B4%E0%B9%80%E0%B8%A8%E0%B8%A9%E0%B8%88%E0%B8%AD%E0%B8%A1%E0%B8%9B%E0%B9%88%E0%B8%A7%E0%B8%99_%E0%B8%A3%E0%B8%B5%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B8%99!"
+          },
+          {
+            "type": "fill",
+            "selector": "input[id='searchInput']",
+            "value": "nonexistentcharacter123xyz"
+          },
+          {
+            "type": "click",
+            "selector": "button.cdx-search-input__end-button"
+          },
+          {
+            "type": "assert_url_contains",
+            "value": "/wiki/%E0%B8%9E%E0%B8%B4%E0%B9%80%E0%B8%A8%E0%B8%A9:%E0%B8%84%E0%B9%89%E0%B8%99%E0%B8%AB%E0%B8%B2/"
+          },
+          {
+            "type": "assert_text_visible",
+            "value": "\u0e44\u0e21\u0e48\u0e21\u0e35\u0e2b\u0e19\u0e49\u0e32\u0e17\u0e35\u0e48\u0e0a\u0e37\u0e48\u0e2d"
+          }
+        ]
       },
       "priority": "high",
       "category": "functional",
       "tags": [
-        "fallback",
-        "smoke"
+        "search",
+        "negative",
+        "error handling"
       ],
       "author": "AI",
-      "created_date": "2026-05-13T01:43:23.714525"
+      "created_date": "2026-05-15T02:02:39.218018"
+    },
+    {
+      "id": "TC_005",
+      "name": "Verify language selector dropdown functionality",
+      "description": "Test if clicking the language selector checkbox reveals the language options and closes correctly.",
+      "preconditions": [
+        "The page is loaded successfully."
+      ],
+      "steps": [
+        "Navigate to the specified Wikipedia page.",
+        "Click the language selector checkbox to open the dropdown.",
+        "Verify that an English language option link ('English') becomes visible within the dropdown.",
+        "Click the language selector checkbox again to close the dropdown."
+      ],
+      "expected_results": [
+        "The language dropdown opens, showing available language links.",
+        "The language dropdown closes when clicked again."
+      ],
+      "test_data": {
+        "actions": [
+          {
+            "type": "goto",
+            "value": "https://th.wikipedia.org/wiki/%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%95%E0%B8%B1%E0%B8%A7%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B9%83%E0%B8%99%E0%B8%84%E0%B8%A3%E0%B8%B9%E0%B8%9E%E0%B8%B4%E0%B9%80%E0%B8%A8%E0%B8%A9%E0%B8%88%E0%B8%AD%E0%B8%A1%E0%B8%9B%E0%B9%88%E0%B8%A7%E0%B8%99_%E0%B8%A3%E0%B8%B5%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B8%99!"
+          },
+          {
+            "type": "click",
+            "selector": "input[id='p-lang-btn-checkbox']"
+          },
+          {
+            "type": "assert_element_visible",
+            "selector": "a[lang='en']"
+          },
+          {
+            "type": "click",
+            "selector": "input[id='p-lang-btn-checkbox']"
+          }
+        ]
+      },
+      "priority": "low",
+      "category": "functional",
+      "tags": [
+        "UI interaction",
+        "language selector",
+        "dropdown"
+      ],
+      "author": "AI",
+      "created_date": "2026-05-15T02:02:39.218018"
     }
   ]
 }
