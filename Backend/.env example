@@ -1,0 +1,87 @@
+# ==========================================
+# AI Testing System - Environment Configuration
+# ==========================================
+
+# ==========================================
+# AI & LLM Configuration
+# ==========================================
+# Provider locked to gemini in ai_engine_test_generator.py
+AI_PROVIDER=gemini
+
+# [IMPORTANT] Rotate this key immediately as it was exposed in logs!
+GEMINI_API_KEY=YOUR_API_KEY
+
+# Model Selection - Use gemini-2.5-flash for speed and higher quota
+AI_MODEL=gemini-2.5-flash
+
+# AI Parameters
+AI_TEMPERATURE=0.7
+# Matches TestGenerator default max_tokens
+AI_MAX_TOKENS=2000
+
+# Rate Limiting (For Paid Tier 1, 100-500 is safe. Default was 10)
+GEMINI_MAX_REQUESTS_PER_MINUTE=100
+
+# Ollama Configuration (Not used when AI_PROVIDER=gemini)
+OLLAMA_HOST=http://localhost:11434
+OLLAMA_TIMEOUT=600
+
+# ==========================================
+# Database Configuration
+# ==========================================
+DATABASE_URL=sqlite:///test_results.db
+DB_ECHO=false
+DB_POOL_SIZE=10
+DB_POOL_RECYCLE=3600
+
+# ==========================================
+# Testing Configuration
+# ==========================================
+BROWSER=chrome
+HEADLESS=true
+TIMEOUT=10
+IMPLICIT_WAIT=5
+EXPLICIT_WAIT=15
+
+# Retry Configuration for Test Script
+RETRY_COUNT=3
+RETRY_DELAY=1
+
+# ==========================================
+# Screenshot & Visual Regression
+# ==========================================
+SCREENSHOT_FORMAT=png
+SCREENSHOT_QUALITY=95
+AUTO_SCREENSHOT=true
+COMPARE_THRESHOLD=0.95
+VISUAL_REGRESSION=true
+
+# ==========================================
+# Report Configuration
+# ==========================================
+GENERATE_HTML=true
+GENERATE_PDF=true
+GENERATE_MARKDOWN=true
+INCLUDE_CHARTS=true
+REPORT_THEME=dark
+
+# ==========================================
+# File Paths
+# ==========================================
+TEST_DATA_PATH=./test_data
+SCREENSHOTS_PATH=./test_data/screenshots
+REPORTS_PATH=./reports
+LOG_FILE=./logs/app.log
+
+# ==========================================
+# Logging & Environment
+# ==========================================
+LOG_LEVEL=INFO
+ENVIRONMENT=development
+
+# ==========================================
+# Feature Flags
+# ==========================================
+ENABLE_SELF_HEALING=true
+ENABLE_AI_ANALYSIS=true
+ENABLE_PERFORMANCE_METRICS=true
