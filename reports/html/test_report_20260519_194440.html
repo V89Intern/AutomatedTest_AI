@@ -1,0 +1,1334 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Test Report - Gemini + Playwright Web Test - https://th.wikipedia.org/wiki/เบบีมอนสเตอร์</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: #333;
+                line-height: 1.6;
+            }
+            
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            
+            header {
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                margin-bottom: 30px;
+            }
+            
+            header h1 {
+                color: #667eea;
+                margin-bottom: 10px;
+                font-size: 2.5em;
+            }
+            
+            header p {
+                color: #666;
+                font-size: 0.95em;
+            }
+            
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+                margin: 30px 0;
+            }
+            
+            .stat-card {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                text-align: center;
+                border-left: 4px solid #667eea;
+            }
+            
+            .stat-card.passed {
+                border-left-color: #28a745;
+            }
+            
+            .stat-card.failed {
+                border-left-color: #dc3545;
+            }
+            
+            .stat-card.skipped {
+                border-left-color: #ffc107;
+            }
+            
+            .stat-card h3 {
+                color: #667eea;
+                font-size: 2em;
+                margin: 10px 0;
+            }
+            
+            .stat-card.passed h3 {
+                color: #28a745;
+            }
+            
+            .stat-card.failed h3 {
+                color: #dc3545;
+            }
+            
+            .stat-card p {
+                color: #666;
+                font-size: 0.9em;
+            }
+            
+            .charts-section {
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                margin-bottom: 30px;
+            }
+            
+            .charts-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+                gap: 30px;
+            }
+            
+            .chart-container {
+                text-align: center;
+            }
+            
+            .chart-container img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 4px;
+            }
+            
+            .tests-section {
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                margin-bottom: 30px;
+            }
+            
+            .tests-section h2 {
+                color: #667eea;
+                margin-bottom: 20px;
+                font-size: 1.5em;
+            }
+            
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            
+            thead {
+                background: #f8f9fa;
+                border-bottom: 2px solid #667eea;
+            }
+            
+            th {
+                padding: 15px;
+                text-align: left;
+                color: #333;
+                font-weight: 600;
+            }
+            
+            td {
+                padding: 12px 15px;
+                border-bottom: 1px solid #e9ecef;
+            }
+            
+            tr:hover {
+                background: #f8f9fa;
+            }
+            
+            .badge {
+                display: inline-block;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 0.85em;
+                font-weight: 600;
+            }
+            
+            .badge.passed {
+                background: #d4edda;
+                color: #155724;
+            }
+            
+            .badge.failed {
+                background: #f8d7da;
+                color: #721c24;
+            }
+            
+            .badge.skipped {
+                background: #fff3cd;
+                color: #856404;
+            }
+            
+            .badge.error {
+                background: #f8d7da;
+                color: #721c24;
+            }
+            
+            .screenshot {
+                max-width: 100%;
+                height: auto;
+                border-radius: 4px;
+                margin: 10px 0;
+            }
+            
+            .test-row-details {
+                display: none;
+            }
+            
+            .test-row-details.show {
+                display: table-row;
+                background: #f8f9fa;
+            }
+            
+            .test-row-details td {
+                padding: 20px;
+            }
+            
+            .error-message {
+                background: #fff3cd;
+                padding: 15px;
+                border-left: 4px solid #ffc107;
+                border-radius: 4px;
+                margin: 10px 0;
+                color: #856404;
+                font-family: 'Courier New', monospace;
+                font-size: 0.9em;
+                max-height: 200px;
+                overflow-y: auto;
+            }
+            
+            footer {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                text-align: center;
+                color: #666;
+                margin-top: 30px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            
+            .expandable-row {
+                cursor: pointer;
+            }
+            
+            .expandable-row:hover {
+                background: #e9ecef;
+            }
+            
+            @media (max-width: 768px) {
+                .container {
+                    padding: 10px;
+                }
+                
+                .stats-grid {
+                    grid-template-columns: 1fr;
+                }
+                
+                .charts-grid {
+                    grid-template-columns: 1fr;
+                }
+                
+                header h1 {
+                    font-size: 1.5em;
+                }
+                
+                table {
+                    font-size: 0.9em;
+                }
+                
+                th, td {
+                    padding: 8px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1>🧪 Test Report</h1>
+                <p><strong>Gemini + Playwright Web Test - https://th.wikipedia.org/wiki/เบบีมอนสเตอร์</strong></p>
+                <p>Generated: 2026-05-19 19:44:40</p>
+            </header>
+            
+            <div class="stats-grid">
+                <div class="stat-card passed">
+                    <p>✅ Passed</p>
+                    <h3>36</h3>
+                    <p>94.74%</p>
+                </div>
+                <div class="stat-card failed">
+                    <p>❌ Failed</p>
+                    <h3>2</h3>
+                    <p>5.26%</p>
+                </div>
+                <div class="stat-card skipped">
+                    <p>⏭️ Skipped</p>
+                    <h3>0</h3>
+                    <p>0.0%</p>
+                </div>
+                <div class="stat-card">
+                    <p>⏱️ Duration</p>
+                    <h3>289.16s</h3>
+                    <p>Total execution time</p>
+                </div>
+            </div>
+            
+            
+            
+            <div class="tests-section">
+                <h2>📋 Test Results</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Test ID</th>
+                            <th>Test Name</th>
+                            <th>Status</th>
+                            <th>Duration</th>
+                            <th>Tags</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>WEB_HTTP_001</td>
+                            <td>HTTP availability</td>
+                            <td><span class="badge failed">FAILED</span></td>
+                            <td>0.256s</td>
+                            <td>
+                                
+                                <span class="badge">web</span>
+                                
+                                <span class="badge">http</span>
+                                
+                                <span class="badge">smoke</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                
+                                <div class="error-message">
+                                    <strong>Error Details:</strong><br>
+                                    Unexpected status code: 403
+                                </div>
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>AI_CTX_001</td>
+                            <td>Collect page context</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>88.068s</td>
+                            <td>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">context</span>
+                                
+                                <span class="badge">discovery</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>AI_GEN_001</td>
+                            <td>Gemini generate website test cases</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>52.553s</td>
+                            <td>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">gemini</span>
+                                
+                                <span class="badge">generation</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>TC_001</td>
+                            <td>Verify Homepage Loads Successfully and Key Elements Are Visible</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>2.844s</td>
+                            <td>
+                                
+                                <span class="badge">playwright</span>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">generated</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_1_20260519_194213.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>TC_002</td>
+                            <td>Verify Search Functionality with a Valid Query from Homepage</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>18.692s</td>
+                            <td>
+                                
+                                <span class="badge">playwright</span>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">generated</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_2_20260519_194216.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>TC_003</td>
+                            <td>Verify Navigation to 'สร้างบัญชี' (Create Account) Page</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>5.082s</td>
+                            <td>
+                                
+                                <span class="badge">playwright</span>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">generated</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_3_20260519_194237.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>TC_004</td>
+                            <td>Verify Internal Table of Contents Navigation on Article Page</td>
+                            <td><span class="badge failed">FAILED</span></td>
+                            <td>5.342s</td>
+                            <td>
+                                
+                                <span class="badge">playwright</span>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">generated</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                
+                                <div class="error-message">
+                                    <strong>Error Details:</strong><br>
+                                    URL mismatch: expected to contain '#ประวัติ', got 'https://th.wikipedia.org/wiki/%E0%B9%80%E0%B8%9A%E0%B8%9A%E0%B8%B5%E0%B8%A1%E0%B8%AD%E0%B8%99%E0%B8%AA%E0%B9%80%E0%B8%95%E0%B8%AD%E0%B8%A3%E0%B9%8C#%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%A7%E0%B8%B1%E0%B8%95%E0%B8%B4'
+                                </div>
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>TC_005</td>
+                            <td>Verify 'บริจาคให้วิกิพีเดีย' (Donate) Link Navigates to External Site</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>4.623s</td>
+                            <td>
+                                
+                                <span class="badge">playwright</span>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">generated</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_5_20260519_194247.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>TC_006</td>
+                            <td>Verify Navigation to 'เข้าสู่ระบบ' (Login) Page</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>6.507s</td>
+                            <td>
+                                
+                                <span class="badge">playwright</span>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">generated</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_6_20260519_194253.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>TC_007</td>
+                            <td>Verify Search Functionality with a Non-existent Query</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>3.491s</td>
+                            <td>
+                                
+                                <span class="badge">playwright</span>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">generated</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_7_20260519_194257.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>TC_009</td>
+                            <td>Verify 'ดูประวัติ' (View History) Link on Homepage</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>5.376s</td>
+                            <td>
+                                
+                                <span class="badge">playwright</span>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">generated</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>TC_010</td>
+                            <td>Verify Font Size Preference Radio Button Interaction</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>2.74s</td>
+                            <td>
+                                
+                                <span class="badge">playwright</span>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">generated</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_003</td>
+                            <td>Page snapshot: วิกิพีเดีย:ถามคำถาม - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>2.395s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_10_20260519_194308.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_004</td>
+                            <td>Page snapshot: สถานีย่อย:เหตุการณ์ปัจจุบัน - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>2.537s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_11_20260519_194310.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_005</td>
+                            <td>Page snapshot: Thelepus - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>2.416s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_12_20260519_194313.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_006</td>
+                            <td>Page snapshot: วิกิพีเดีย:เกี่ยวกับ - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>4.306s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_13_20260519_194316.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_007</td>
+                            <td>Page snapshot: วิกิพีเดีย:ติดต่อ - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>3.957s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_14_20260519_194321.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_008</td>
+                            <td>Page snapshot: วิธีใช้:สารบัญ - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>3.719s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_15_20260519_194325.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_009</td>
+                            <td>Page snapshot: วิกิพีเดีย:สอนการใช้งาน - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>4.142s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_16_20260519_194329.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_010</td>
+                            <td>Page snapshot: วิกิพีเดีย:ศาลาประชาคม - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>2.34s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_17_20260519_194332.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_011</td>
+                            <td>Page snapshot: ปรับปรุงล่าสุด - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>4.946s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_18_20260519_194337.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_012</td>
+                            <td>Page snapshot: วิกิพีเดีย:ดิสคอร์ด - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>3.561s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_19_20260519_194340.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_013</td>
+                            <td>Page snapshot: ค้นหา - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>3.914s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_20_20260519_194344.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_015</td>
+                            <td>Page snapshot: พูดคุย:เบบีมอนสเตอร์ - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>2.852s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_21_20260519_194347.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_016</td>
+                            <td>Page snapshot: พูดคุย:หน้าหลัก - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>4.192s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_22_20260519_194351.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_017</td>
+                            <td>Page snapshot: คุยเรื่องวิกิพีเดีย:ถามคำถาม - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>2.933s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_23_20260519_194354.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_018</td>
+                            <td>Page snapshot: คุยเรื่องสถานีย่อย:เหตุการณ์ปัจจุบัน - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>3.533s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_24_20260519_194358.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_019</td>
+                            <td>Page snapshot: คุยเรื่องวิกิพีเดีย:เกี่ยวกับ - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>2.8s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_25_20260519_194401.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_020</td>
+                            <td>Page snapshot: คุยเรื่องวิกิพีเดีย:ติดต่อ - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>3.014s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_26_20260519_194404.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_021</td>
+                            <td>Page snapshot: คุยเรื่องวิธีใช้:สารบัญ - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>4.277s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_27_20260519_194408.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_022</td>
+                            <td>Page snapshot: หน้าที่ลิงก์มา "วิธีใช้:สารบัญ" - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>2.999s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_28_20260519_194411.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_023</td>
+                            <td>Page snapshot: คุยเรื่องวิกิพีเดีย:สอนการใช้งาน - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>2.939s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_29_20260519_194414.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_024</td>
+                            <td>Page snapshot: คุยเรื่องวิกิพีเดีย:ศาลาประชาคม - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>4.797s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_30_20260519_194419.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_025</td>
+                            <td>Page snapshot: </td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>8.817s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_31_20260519_194423.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_026</td>
+                            <td>Page snapshot: วิกิพีเดีย:อัปโหลด - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>2.449s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_32_20260519_194430.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_027</td>
+                            <td>Page snapshot: คุยเรื่องวิกิพีเดีย:ดิสคอร์ด - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>3.595s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_33_20260519_194434.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_028</td>
+                            <td>Page snapshot: สร้างบัญชี - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>3.067s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_34_20260519_194437.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>SNAP_029</td>
+                            <td>Page snapshot: คุยเรื่องวิกิพีเดีย:อัปโหลด - วิกิพีเดีย</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>3.088s</td>
+                            <td>
+                                
+                                <span class="badge">snapshot</span>
+                                
+                                <span class="badge">guaranteed</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_เบบีมอนสเตอร์_tc_35_20260519_194440.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                    </tbody>
+                </table>
+            </div>
+            
+            <footer>
+                <p>Generated by AI Testing System | Version 1.0.0</p>
+                <p><small>Total Tests: 38 | Pass Rate: 94.74%</small></p>
+            </footer>
+        </div>
+        
+        <script>
+            function toggleDetails(row) {
+                const nextRow = row.nextElementSibling;
+                if (nextRow && nextRow.classList.contains('test-row-details')) {
+                    nextRow.classList.toggle('show');
+                }
+            }
+        </script>
+    </body>
+    </html>
+    

@@ -1,0 +1,509 @@
+{
+  "generated_at": "2026-05-19T20:59:25.508084",
+  "total_tests": 10,
+  "test_cases": [
+    {
+      "id": "TC_001",
+      "name": "Verify Homepage Loads and Cookie Acceptance",
+      "description": "Tests if the homepage loads successfully and the cookie acceptance banner can be dismissed by clicking 'Accept All'.",
+      "preconditions": [],
+      "steps": [
+        "Navigate to the homepage.",
+        "Click 'Accept All' on the cookie banner.",
+        "Verify a main navigation element is visible, implying the cookie banner is no longer obscuring content."
+      ],
+      "expected_results": [
+        "Homepage loads without errors.",
+        "Cookie banner disappears after accepting.",
+        "Main page content is fully accessible."
+      ],
+      "test_data": {
+        "actions": [
+          {
+            "type": "goto",
+            "value": "https://www.terabyteplus.com/"
+          },
+          {
+            "type": "assert_element_visible",
+            "selector": "button.cky-btn.cky-btn-accept"
+          },
+          {
+            "type": "click",
+            "selector": "button.cky-btn.cky-btn-accept"
+          },
+          {
+            "type": "wait",
+            "value": 500
+          },
+          {
+            "type": "assert_element_visible",
+            "selector": "a[href='https://www.terabyteplus.com/company-profile/']"
+          }
+        ]
+      },
+      "priority": "high",
+      "category": "smoke",
+      "tags": [
+        "homepage",
+        "cookies",
+        "functional",
+        "page-loading"
+      ],
+      "author": "AI",
+      "created_date": "2026-05-19T20:59:25.507472"
+    },
+    {
+      "id": "TC_002",
+      "name": "Verify Navigation to About Us Page",
+      "description": "Tests navigation from the homepage to the '\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e01\u0e31\u0e1a\u0e40\u0e23\u0e32' (About Us) page via the header link.",
+      "preconditions": [
+        "Homepage is loaded and cookie banner handled."
+      ],
+      "steps": [
+        "Navigate to the homepage.",
+        "Click the '\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e01\u0e31\u0e1a\u0e40\u0e23\u0e32' link in the header.",
+        "Verify the URL changes to the About Us page.",
+        "Verify specific text from the About Us page is visible."
+      ],
+      "expected_results": [
+        "User is successfully navigated to the About Us page.",
+        "About Us page content is displayed correctly."
+      ],
+      "test_data": {
+        "actions": [
+          {
+            "type": "goto",
+            "value": "https://www.terabyteplus.com/"
+          },
+          {
+            "type": "click",
+            "selector": "button.cky-btn.cky-btn-accept"
+          },
+          {
+            "type": "click",
+            "selector": "a[href='https://www.terabyteplus.com/company-profile/']"
+          },
+          {
+            "type": "assert_url_contains",
+            "value": "company-profile"
+          },
+          {
+            "type": "assert_text_visible",
+            "value": "\u0e27\u0e34\u0e2a\u0e31\u0e22\u0e17\u0e31\u0e28\u0e19\u0e4c\u0e41\u0e25\u0e30\u0e1e\u0e31\u0e19\u0e18\u0e01\u0e34\u0e08"
+          }
+        ]
+      },
+      "priority": "high",
+      "category": "functional",
+      "tags": [
+        "navigation",
+        "about-us",
+        "links"
+      ],
+      "author": "AI",
+      "created_date": "2026-05-19T20:59:25.507490"
+    },
+    {
+      "id": "TC_003",
+      "name": "Verify Facebook Social Media Link Functionality",
+      "description": "Tests if clicking the Facebook social media icon navigates to the correct external Facebook page.",
+      "preconditions": [
+        "Homepage is loaded and cookie banner handled."
+      ],
+      "steps": [
+        "Navigate to the homepage.",
+        "Click the Facebook icon.",
+        "Verify the browser navigates to the Terabyte Plus Facebook page URL."
+      ],
+      "expected_results": [
+        "The Facebook page for Terabyte Plus is opened successfully."
+      ],
+      "test_data": {
+        "actions": [
+          {
+            "type": "goto",
+            "value": "https://www.terabyteplus.com/"
+          },
+          {
+            "type": "click",
+            "selector": "button.cky-btn.cky-btn-accept"
+          },
+          {
+            "type": "click",
+            "selector": "a[href='https://www.facebook.com/Terabytepluspublic']"
+          },
+          {
+            "type": "wait",
+            "value": 2000
+          },
+          {
+            "type": "assert_url_contains",
+            "value": "facebook.com/Terabytepluspublic"
+          }
+        ]
+      },
+      "priority": "medium",
+      "category": "functional",
+      "tags": [
+        "social-media",
+        "links",
+        "external-navigation"
+      ],
+      "author": "AI",
+      "created_date": "2026-05-19T20:59:25.507498"
+    },
+    {
+      "id": "TC_004",
+      "name": "Verify Navigation to Cloud & Recurring Services Detail Page",
+      "description": "Tests navigation from the homepage to the '\u0e1c\u0e25\u0e34\u0e15\u0e20\u0e31\u0e13\u0e11\u0e4c\u0e41\u0e25\u0e30\u0e1a\u0e23\u0e34\u0e01\u0e32\u0e23' (Products & Services) page, then to the 'CLOUD & RECURRING SERVICES' detail page.",
+      "preconditions": [
+        "Homepage is loaded and cookie banner handled."
+      ],
+      "steps": [
+        "Navigate to the homepage.",
+        "Click the '\u0e1c\u0e25\u0e34\u0e15\u0e20\u0e31\u0e13\u0e11\u0e4c\u0e41\u0e25\u0e30\u0e1a\u0e23\u0e34\u0e01\u0e32\u0e23' link in the header.",
+        "Click the '\u0e14\u0e39\u0e23\u0e32\u0e22\u0e25\u0e30\u0e40\u0e2d\u0e35\u0e22\u0e14' (View Details) button for 'CLOUD & RECURRING SERVICES'.",
+        "Verify the URL changes to the Cloud & Recurring Services page."
+      ],
+      "expected_results": [
+        "User is successfully navigated to the Cloud & Recurring Services detail page.",
+        "The detail page's URL is correct."
+      ],
+      "test_data": {
+        "actions": [
+          {
+            "type": "goto",
+            "value": "https://www.terabyteplus.com/"
+          },
+          {
+            "type": "click",
+            "selector": "button.cky-btn.cky-btn-accept"
+          },
+          {
+            "type": "click",
+            "selector": "a[href='https://www.terabyteplus.com/service/']"
+          },
+          {
+            "type": "assert_url_contains",
+            "value": "service"
+          },
+          {
+            "type": "click",
+            "selector": "a[href='https://www.terabyteplus.com/cloud-recurring-services/']"
+          },
+          {
+            "type": "assert_url_contains",
+            "value": "cloud-recurring-services"
+          }
+        ]
+      },
+      "priority": "high",
+      "category": "functional",
+      "tags": [
+        "navigation",
+        "products",
+        "services",
+        "links"
+      ],
+      "author": "AI",
+      "created_date": "2026-05-19T20:59:25.507504"
+    },
+    {
+      "id": "TC_005",
+      "name": "Verify Search Toggle Functionality",
+      "description": "Tests if clicking the search toggle button reveals a search input field.",
+      "preconditions": [
+        "Homepage is loaded and cookie banner handled."
+      ],
+      "steps": [
+        "Navigate to the homepage.",
+        "Click the 'Search' toggle button.",
+        "Verify that a search input field or search container becomes visible."
+      ],
+      "expected_results": [
+        "Search input field/container is displayed after clicking the toggle."
+      ],
+      "test_data": {
+        "actions": [
+          {
+            "type": "goto",
+            "value": "https://www.terabyteplus.com/"
+          },
+          {
+            "type": "click",
+            "selector": "button.cky-btn.cky-btn-accept"
+          },
+          {
+            "type": "click",
+            "selector": "div[role='button'].elementor-search-form__toggle"
+          },
+          {
+            "type": "wait",
+            "value": 500
+          },
+          {
+            "type": "assert_element_visible",
+            "selector": "div.elementor-search-form"
+          }
+        ]
+      },
+      "priority": "medium",
+      "category": "functional",
+      "tags": [
+        "search",
+        "ui",
+        "buttons"
+      ],
+      "author": "AI",
+      "created_date": "2026-05-19T20:59:25.507509"
+    },
+    {
+      "id": "TC_006",
+      "name": "Verify Footer Home Link on Products & Services Page",
+      "description": "Tests navigation from the Products & Services page back to the homepage using the footer '\u0e2b\u0e19\u0e49\u0e32\u0e2b\u0e25\u0e31\u0e01' (Home) link.",
+      "preconditions": [
+        "Products & Services page is loaded."
+      ],
+      "steps": [
+        "Navigate to the Products & Services page.",
+        "Click the '\u0e2b\u0e19\u0e49\u0e32\u0e2b\u0e25\u0e31\u0e01' (Home) link in the footer.",
+        "Verify the URL changes back to the homepage."
+      ],
+      "expected_results": [
+        "User is successfully navigated back to the homepage from the footer link."
+      ],
+      "test_data": {
+        "actions": [
+          {
+            "type": "goto",
+            "value": "https://www.terabyteplus.com/service/"
+          },
+          {
+            "type": "click",
+            "selector": "button.cky-btn.cky-btn-accept"
+          },
+          {
+            "type": "click",
+            "selector": "footer a:has-text('\u0e2b\u0e19\u0e49\u0e32\u0e2b\u0e25\u0e31\u0e01')"
+          },
+          {
+            "type": "assert_url_contains",
+            "value": "https://www.terabyteplus.com/"
+          },
+          {
+            "type": "assert_element_visible",
+            "selector": "a[href='https://www.terabyteplus.com/company-profile/']"
+          }
+        ]
+      },
+      "priority": "low",
+      "category": "regression",
+      "tags": [
+        "footer",
+        "navigation",
+        "links"
+      ],
+      "author": "AI",
+      "created_date": "2026-05-19T20:59:25.507515"
+    },
+    {
+      "id": "TC_007",
+      "name": "Verify Skip to Content Link Functionality",
+      "description": "Tests if the 'Skip to content' link correctly changes the URL hash to '#main', indicating a jump to the main content area.",
+      "preconditions": [
+        "Homepage is loaded and cookie banner handled."
+      ],
+      "steps": [
+        "Navigate to the homepage.",
+        "Click the 'Skip to content' link.",
+        "Verify the URL hash contains '#main'."
+      ],
+      "expected_results": [
+        "The page's URL reflects the jump to the main content section."
+      ],
+      "test_data": {
+        "actions": [
+          {
+            "type": "goto",
+            "value": "https://www.terabyteplus.com/"
+          },
+          {
+            "type": "click",
+            "selector": "button.cky-btn.cky-btn-accept"
+          },
+          {
+            "type": "click",
+            "selector": "a[href='#main'].skip-link"
+          },
+          {
+            "type": "assert_url_contains",
+            "value": "#main"
+          }
+        ]
+      },
+      "priority": "low",
+      "category": "accessibility",
+      "tags": [
+        "accessibility",
+        "links",
+        "navigation"
+      ],
+      "author": "AI",
+      "created_date": "2026-05-19T20:59:25.507520"
+    },
+    {
+      "id": "TC_008",
+      "name": "Verify Mailto Link Presence",
+      "description": "Tests if the 'marketing@terabyteplus.com' mailto link is present and visible on the homepage, without triggering an external application.",
+      "preconditions": [
+        "Homepage is loaded and cookie banner handled."
+      ],
+      "steps": [
+        "Navigate to the homepage.",
+        "Verify the 'marketing@terabyteplus.com' link is visible.",
+        "Verify the page URL remains unchanged, indicating no browser navigation occurred."
+      ],
+      "expected_results": [
+        "The mailto link is visible on the page.",
+        "Clicking or interacting with the mailto link does not cause browser navigation."
+      ],
+      "test_data": {
+        "actions": [
+          {
+            "type": "goto",
+            "value": "https://www.terabyteplus.com/"
+          },
+          {
+            "type": "click",
+            "selector": "button.cky-btn.cky-btn-accept"
+          },
+          {
+            "type": "assert_element_visible",
+            "selector": "a[href='mailto:marketing@terabyteplus.com']"
+          },
+          {
+            "type": "assert_url_contains",
+            "value": "https://www.terabyteplus.com/"
+          }
+        ]
+      },
+      "priority": "low",
+      "category": "functional",
+      "tags": [
+        "links",
+        "email",
+        "contact"
+      ],
+      "author": "AI",
+      "created_date": "2026-05-19T20:59:25.507525"
+    },
+    {
+      "id": "TC_009",
+      "name": "Verify Homepage Carousel Navigation",
+      "description": "Tests if the homepage carousel's 'Next slide' and 'Previous slide' buttons are clickable and trigger a slide change.",
+      "preconditions": [
+        "Homepage is loaded and cookie banner handled."
+      ],
+      "steps": [
+        "Navigate to the homepage.",
+        "Click the 'Next slide' button.",
+        "Click the 'Previous slide' button.",
+        "Verify a carousel pagination bullet is visible, indicating the carousel is present and interactive."
+      ],
+      "expected_results": [
+        "Carousel slides forward and backward successfully.",
+        "Carousel elements remain visible and interactive."
+      ],
+      "test_data": {
+        "actions": [
+          {
+            "type": "goto",
+            "value": "https://www.terabyteplus.com/"
+          },
+          {
+            "type": "click",
+            "selector": "button.cky-btn.cky-btn-accept"
+          },
+          {
+            "type": "click",
+            "selector": "div[role='button'].elementor-swiper-button-next"
+          },
+          {
+            "type": "wait",
+            "value": 1000
+          },
+          {
+            "type": "click",
+            "selector": "div[role='button'].elementor-swiper-button-prev"
+          },
+          {
+            "type": "wait",
+            "value": 1000
+          },
+          {
+            "type": "assert_element_visible",
+            "selector": "span[role='button'].swiper-pagination-bullet"
+          }
+        ]
+      },
+      "priority": "medium",
+      "category": "functional",
+      "tags": [
+        "carousel",
+        "ui",
+        "buttons"
+      ],
+      "author": "AI",
+      "created_date": "2026-05-19T20:59:25.507529"
+    },
+    {
+      "id": "TC_010",
+      "name": "Verify Investor Relations External Link",
+      "description": "Tests if clicking the '\u0e19\u0e31\u0e01\u0e25\u0e07\u0e17\u0e38\u0e19\u0e2a\u0e31\u0e21\u0e1e\u0e31\u0e19\u0e18\u0e4c' (Investor Relations) link navigates to the external investor relations website.",
+      "preconditions": [
+        "Homepage is loaded and cookie banner handled."
+      ],
+      "steps": [
+        "Navigate to the homepage.",
+        "Click the '\u0e19\u0e31\u0e01\u0e25\u0e07\u0e17\u0e38\u0e19\u0e2a\u0e31\u0e21\u0e1e\u0e31\u0e19\u0e18\u0e4c' link in the header.",
+        "Verify the URL changes to the external investor.terabyteplus.com website."
+      ],
+      "expected_results": [
+        "User is successfully navigated to the investor.terabyteplus.com website."
+      ],
+      "test_data": {
+        "actions": [
+          {
+            "type": "goto",
+            "value": "https://www.terabyteplus.com/"
+          },
+          {
+            "type": "click",
+            "selector": "button.cky-btn.cky-btn-accept"
+          },
+          {
+            "type": "click",
+            "selector": "a[href='https://investor.terabyteplus.com/']"
+          },
+          {
+            "type": "wait",
+            "value": 2000
+          },
+          {
+            "type": "assert_url_contains",
+            "value": "investor.terabyteplus.com"
+          }
+        ]
+      },
+      "priority": "high",
+      "category": "functional",
+      "tags": [
+        "navigation",
+        "external-link",
+        "investor-relations"
+      ],
+      "author": "AI",
+      "created_date": "2026-05-19T20:59:25.507534"
+    }
+  ]
+}

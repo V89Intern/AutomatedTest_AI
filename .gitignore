@@ -22,13 +22,10 @@ venv/
 .env.*
 !.env.example
 
-# Test output & screenshots
-test_data/
-Backend/test_data/
-Backend/reports/
+# Logs only
 Backend/logs/
-reports/
 logs/
+*.log
 
 # Database
 *.db
