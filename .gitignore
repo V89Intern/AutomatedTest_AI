@@ -14,6 +14,9 @@ __pycache__/
 *.pyd
 venv/
 
+# Claude Code local config
+.claude/
+
 # Environment & Secrets (NEVER commit these)
 .env
 .env.*
