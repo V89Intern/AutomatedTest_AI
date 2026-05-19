@@ -1,0 +1,540 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Test Report - Gemini + Playwright Web Test - https://th.wikipedia.org/wiki/%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%95%E0%B8%B1%E0%B8%A7%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B9%83%E0%B8%99%E0%B8%84%E0%B8%A3%E0%B8%B9%E0%B8%9E%E0%B8%B4%E0%B9%80%E0%B8%A8%E0%B8%A9%E0%B8%88%E0%B8%AD%E0%B8%A1%E0%B8%9B%E0%B9%88%E0%B8%A7%E0%B8%99_%E0%B8%A3%E0%B8%B5%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B8%99!</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: #333;
+                line-height: 1.6;
+            }
+            
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            
+            header {
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                margin-bottom: 30px;
+            }
+            
+            header h1 {
+                color: #667eea;
+                margin-bottom: 10px;
+                font-size: 2.5em;
+            }
+            
+            header p {
+                color: #666;
+                font-size: 0.95em;
+            }
+            
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+                margin: 30px 0;
+            }
+            
+            .stat-card {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                text-align: center;
+                border-left: 4px solid #667eea;
+            }
+            
+            .stat-card.passed {
+                border-left-color: #28a745;
+            }
+            
+            .stat-card.failed {
+                border-left-color: #dc3545;
+            }
+            
+            .stat-card.skipped {
+                border-left-color: #ffc107;
+            }
+            
+            .stat-card h3 {
+                color: #667eea;
+                font-size: 2em;
+                margin: 10px 0;
+            }
+            
+            .stat-card.passed h3 {
+                color: #28a745;
+            }
+            
+            .stat-card.failed h3 {
+                color: #dc3545;
+            }
+            
+            .stat-card p {
+                color: #666;
+                font-size: 0.9em;
+            }
+            
+            .charts-section {
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                margin-bottom: 30px;
+            }
+            
+            .charts-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+                gap: 30px;
+            }
+            
+            .chart-container {
+                text-align: center;
+            }
+            
+            .chart-container img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 4px;
+            }
+            
+            .tests-section {
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                margin-bottom: 30px;
+            }
+            
+            .tests-section h2 {
+                color: #667eea;
+                margin-bottom: 20px;
+                font-size: 1.5em;
+            }
+            
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            
+            thead {
+                background: #f8f9fa;
+                border-bottom: 2px solid #667eea;
+            }
+            
+            th {
+                padding: 15px;
+                text-align: left;
+                color: #333;
+                font-weight: 600;
+            }
+            
+            td {
+                padding: 12px 15px;
+                border-bottom: 1px solid #e9ecef;
+            }
+            
+            tr:hover {
+                background: #f8f9fa;
+            }
+            
+            .badge {
+                display: inline-block;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 0.85em;
+                font-weight: 600;
+            }
+            
+            .badge.passed {
+                background: #d4edda;
+                color: #155724;
+            }
+            
+            .badge.failed {
+                background: #f8d7da;
+                color: #721c24;
+            }
+            
+            .badge.skipped {
+                background: #fff3cd;
+                color: #856404;
+            }
+            
+            .badge.error {
+                background: #f8d7da;
+                color: #721c24;
+            }
+            
+            .screenshot {
+                max-width: 100%;
+                height: auto;
+                border-radius: 4px;
+                margin: 10px 0;
+            }
+            
+            .test-row-details {
+                display: none;
+            }
+            
+            .test-row-details.show {
+                display: table-row;
+                background: #f8f9fa;
+            }
+            
+            .test-row-details td {
+                padding: 20px;
+            }
+            
+            .error-message {
+                background: #fff3cd;
+                padding: 15px;
+                border-left: 4px solid #ffc107;
+                border-radius: 4px;
+                margin: 10px 0;
+                color: #856404;
+                font-family: 'Courier New', monospace;
+                font-size: 0.9em;
+                max-height: 200px;
+                overflow-y: auto;
+            }
+            
+            footer {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                text-align: center;
+                color: #666;
+                margin-top: 30px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            
+            .expandable-row {
+                cursor: pointer;
+            }
+            
+            .expandable-row:hover {
+                background: #e9ecef;
+            }
+            
+            @media (max-width: 768px) {
+                .container {
+                    padding: 10px;
+                }
+                
+                .stats-grid {
+                    grid-template-columns: 1fr;
+                }
+                
+                .charts-grid {
+                    grid-template-columns: 1fr;
+                }
+                
+                header h1 {
+                    font-size: 1.5em;
+                }
+                
+                table {
+                    font-size: 0.9em;
+                }
+                
+                th, td {
+                    padding: 8px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1>🧪 Test Report</h1>
+                <p><strong>Gemini + Playwright Web Test - https://th.wikipedia.org/wiki/%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%95%E0%B8%B1%E0%B8%A7%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B9%83%E0%B8%99%E0%B8%84%E0%B8%A3%E0%B8%B9%E0%B8%9E%E0%B8%B4%E0%B9%80%E0%B8%A8%E0%B8%A9%E0%B8%88%E0%B8%AD%E0%B8%A1%E0%B8%9B%E0%B9%88%E0%B8%A7%E0%B8%99_%E0%B8%A3%E0%B8%B5%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B8%99!</strong></p>
+                <p>Generated: 2026-05-15 02:02:52</p>
+            </header>
+            
+            <div class="stats-grid">
+                <div class="stat-card passed">
+                    <p>✅ Passed</p>
+                    <h3>5</h3>
+                    <p>62.5%</p>
+                </div>
+                <div class="stat-card failed">
+                    <p>❌ Failed</p>
+                    <h3>3</h3>
+                    <p>37.5%</p>
+                </div>
+                <div class="stat-card skipped">
+                    <p>⏭️ Skipped</p>
+                    <h3>0</h3>
+                    <p>0.0%</p>
+                </div>
+                <div class="stat-card">
+                    <p>⏱️ Duration</p>
+                    <h3>51.98s</h3>
+                    <p>Total execution time</p>
+                </div>
+            </div>
+            
+            
+            
+            <div class="tests-section">
+                <h2>📋 Test Results</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Test ID</th>
+                            <th>Test Name</th>
+                            <th>Status</th>
+                            <th>Duration</th>
+                            <th>Tags</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>WEB_HTTP_001</td>
+                            <td>HTTP availability</td>
+                            <td><span class="badge failed">FAILED</span></td>
+                            <td>0.341s</td>
+                            <td>
+                                
+                                <span class="badge">web</span>
+                                
+                                <span class="badge">http</span>
+                                
+                                <span class="badge">smoke</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                
+                                <div class="error-message">
+                                    <strong>Error Details:</strong><br>
+                                    Unexpected status code: 403
+                                </div>
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>AI_CTX_001</td>
+                            <td>Collect page context</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>2.685s</td>
+                            <td>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">context</span>
+                                
+                                <span class="badge">discovery</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>AI_GEN_001</td>
+                            <td>Gemini generate website test cases</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>36.538s</td>
+                            <td>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">gemini</span>
+                                
+                                <span class="badge">generation</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>TC_001</td>
+                            <td>Verify successful search for a character</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>2.598s</td>
+                            <td>
+                                
+                                <span class="badge">playwright</span>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">generated</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%_tc_1_20260515_020242.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>TC_002</td>
+                            <td>Verify navigation to 'Vongola Family' section via TOC link</td>
+                            <td><span class="badge failed">FAILED</span></td>
+                            <td>0.522s</td>
+                            <td>
+                                
+                                <span class="badge">playwright</span>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">generated</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                
+                                <div class="error-message">
+                                    <strong>Error Details:</strong><br>
+                                    URL mismatch: expected to contain '#วองโกเล่_แฟมิลี', got 'https://th.wikipedia.org/wiki/%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%95%E0%B8%B1%E0%B8%A7%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B9%83%E0%B8%99%E0%B8%84%E0%B8%A3%E0%B8%B9%E0%B8%9E%E0%B8%B4%E0%B9%80%E0%B8%A8%E0%B8%A9%E0%B8%88%E0%B8%AD%E0%B8%A1%E0%B8%9B%E0%B9%88%E0%B8%A7%E0%B8%99_%E0%B8%A3%E0%B8%B5%E0%B8%9A%E0%B8%AD%E0%B8%A3%E0%B9%8C%E0%B8%99!#%E0%B8%A7%E0%B8%AD%E0%B8%87%E0%B9%82%E0%B8%81%E0%B9%80%E0%B8%A5%E0%B9%88_%E0%B9%81%E0%B8%9F%E0%B8%A1%E0%B8%B4%E0%B8%A5%E0%B8%B5'
+                                </div>
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>TC_003</td>
+                            <td>Verify 'Donate to Wikipedia' external link navigation</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>3.044s</td>
+                            <td>
+                                
+                                <span class="badge">playwright</span>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">generated</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%_tc_3_20260515_020244.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>TC_004</td>
+                            <td>Verify search for a non-existent term (negative scenario)</td>
+                            <td><span class="badge failed">FAILED</span></td>
+                            <td>1.349s</td>
+                            <td>
+                                
+                                <span class="badge">playwright</span>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">generated</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                
+                                <div class="error-message">
+                                    <strong>Error Details:</strong><br>
+                                    URL mismatch: expected to contain '/wiki/%E0%B8%9E%E0%B8%B4%E0%B9%80%E0%B8%A8%E0%B8%A9:%E0%B8%84%E0%B9%89%E0%B8%99%E0%B8%AB%E0%B8%B2/', got 'https://th.wikipedia.org/w/index.php?search=nonexistentcharacter123xyz&title=%E0%B8%9E%E0%B8%B4%E0%B9%80%E0%B8%A8%E0%B8%A9%3A%E0%B8%84%E0%B9%89%E0%B8%99%E0%B8%AB%E0%B8%B2&wprov=acrw1_-1'
+                                </div>
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                        <tr class="expandable-row" onclick="toggleDetails(this)">
+                            <td>TC_005</td>
+                            <td>Verify language selector dropdown functionality</td>
+                            <td><span class="badge passed">PASSED</span></td>
+                            <td>4.898s</td>
+                            <td>
+                                
+                                <span class="badge">playwright</span>
+                                
+                                <span class="badge">ai</span>
+                                
+                                <span class="badge">generated</span>
+                                
+                            </td>
+                        </tr>
+                        
+                        <tr class="test-row-details">
+                            <td colspan="5">
+                                
+                                <div>
+                                    <p><strong>Screenshot:</strong></p>
+                                    <img src="test_data\screenshots\current\th.wikipedia.org_wiki_%E0%B8%A3%E0%B8%B2%E0%B8%A2%E0%B8%8A%E0%B8%B7%E0%B9%88%E0%_tc_5_20260515_020248.png" alt="Test Screenshot" class="screenshot">
+                                </div>
+                                
+                                
+                            </td>
+                        </tr>
+                        
+                        
+                    </tbody>
+                </table>
+            </div>
+            
+            <footer>
+                <p>Generated by AI Testing System | Version 1.0.0</p>
+                <p><small>Total Tests: 8 | Pass Rate: 62.5%</small></p>
+            </footer>
+        </div>
+        
+        <script>
+            function toggleDetails(row) {
+                const nextRow = row.nextElementSibling;
+                if (nextRow && nextRow.classList.contains('test-row-details')) {
+                    nextRow.classList.toggle('show');
+                }
+            }
+        </script>
+    </body>
+    </html>
+    
