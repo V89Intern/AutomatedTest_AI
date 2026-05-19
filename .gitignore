@@ -1,0 +1,37 @@
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+
+# Environment & Secrets (NEVER commit these)
+.env
+.env.*
+!.env.example
+
+# Test output & screenshots
+test_data/
+Backend/test_data/
+Backend/reports/
+Backend/logs/
+reports/
+logs/
+
+# Database
+*.db
+*.sqlite
+
+# Misc
+playwright-report/
+test-results/
+*.log
